@@ -1,7 +1,9 @@
 #include <string>
 
 #include "AnimData.h"
+#include "Character.h"
 #include "Menu.h"
+#include "Nebuala.h"
 #include "raylib.h"
 
 using namespace std;
@@ -10,10 +12,8 @@ using namespace std;
 const int windowWidth{1350};
 const int windowHeight{1100};
 
-bool IsOnGround(AnimData data, int windowHeight)
-{
-    return  data.pos.y >= windowHeight - data.rect.height;
-}
+// acceleration due to gravity (pixels/s)/s
+const int gravity{1000};
 
 void DrawBackground(const Texture2D farBG, float bgX)
 {
@@ -60,26 +60,14 @@ void DebugLog(const char* text)
     DrawText(text, windowWidth/4 - txtSize.x/2,windowHeight/8 * 7, 50.f,WHITE );
 }
 
-void InitNebulae(const Texture2D& nebula,const int nebulaeAmount, AnimData(nebulea)[15])
-{
-    for (int i = 0; i < nebulaeAmount; i++)
-    {
-        nebulea[i].rect.x = 0.0;
-        nebulea[i].rect.y = 0.0;
-        nebulea[i].rect.width = nebula.width/8;
-        nebulea[i].rect.height = nebula.height/8;
-        nebulea[i].pos.y = windowHeight - nebula.height/8;
-        nebulea[i].pos.x = windowWidth + (300 * i);
-        nebulea[i].frame = i;
-        nebulea[i].maxFrame = 7;
-        nebulea[i].runningTime = 1.0/12.0;
-        nebulea[i].updateTime = 0.0;
-    }
-}
+
 
 int main()
 {
     InitWindow(windowWidth,windowHeight,"Dapper dasher!");
+
+    bool StartGame{false};
+    bool QuitGame{false};
 
     //Background
     const Texture2D farBG = LoadTexture("textures/far-buildings.png");
@@ -88,41 +76,21 @@ int main()
     float bgX{};
     float mdgX{};
     float fgX{};
+
+    //Scarfy
+    Character scarfy{
+        windowWidth,windowHeight,
+        LoadTexture("textures/scarfy.png"),
+        6,1, -600, gravity
+    };
     
     //Nebula
-    const Texture2D nebula = LoadTexture("textures/12_nebula_spritesheet.png");
+    Nebula nebula{windowWidth,windowHeight};
     int nebulaeAmount = 15;
-    int nebVel{-200};
-    AnimData nebulea[15];
-    InitNebulae(nebula, nebulaeAmount, nebulea);
-    float finishLine{nebulea[nebulaeAmount - 1].pos.x};
+    //float finishLine{nebulea[nebulaeAmount - 1].pos.x};
     
-    //Scarfy 
-    const Texture2D scarfy = LoadTexture("textures/scarfy.png");
-    AnimData scarfyData;
-    scarfyData.rect.width = scarfy.width/6;
-    scarfyData.rect.height = scarfy.width/6,scarfy.height;
-    scarfyData.rect.x = 0;
-    scarfyData.rect.y = 0;
-    scarfyData.pos.x = windowWidth/2 - (scarfy.width/6)/2;
-    scarfyData.pos.y = windowHeight - scarfy.height;
-    scarfyData.frame = 0;
-    scarfyData.maxFrame = 5;
-    scarfyData.updateTime = 1.f/12.f;
-    scarfyData.runningTime = 0.f;
     
-    // acceleration due to gravity (pixels/s)/s
-    const int gravity{1000};
     
-    //pixels/s
-    const int jumpVel{-600};
-    int velocity{0};
-    
-    bool isInAir{false};
-    bool isDead{false};
-    bool startGame{false};
-    bool quitGame{false};
-
     //Menu & Buttons
     Menu menu(windowWidth,windowHeight,"Dapper Dasher", true);
 
@@ -190,7 +158,7 @@ int main()
 
     bool playMusic{false};
     
-    while (!WindowShouldClose() && !quitGame)
+    while (!WindowShouldClose() && !scarfy.QuitGame)
     {
         if(IsKeyPressed(KEY_P)) playMusic = !playMusic;
         
@@ -202,7 +170,7 @@ int main()
         BeginDrawing();
         ClearBackground(PURPLE);
 
-        if(!isDead)
+        if(!scarfy.IsDead)
         {
             //Update background position
             bgX -= 20 * deltaTime;
@@ -240,6 +208,8 @@ int main()
 
         //Draw Credit text
         DrawText(credits.c_str(), windowWidth/2 - textLength/2, 20.f, 20,WHITE );
+
+        scarfy.Tick(deltaTime);
         
 
         //Draw Music icons & buttons
@@ -319,53 +289,32 @@ int main()
             DrawTexture(musicText,musicIconPosPurple.x,musicIconPosPurple.y, WHITE);
         }
 
-        menu.Show(!startGame,startGameButton, quitGameButton);
+        menu.Show(!StartGame,startGameButton, quitGameButton);
         
         if(startGameButton.MouseOverButton(mousePos) && startGameButton.Clicked(mousePos))
         {
             PlaySound(button_click_sound);
-            startGame = true;
-            InitNebulae(nebula, nebulaeAmount, nebulea);
-            finishLine = nebulea[nebulaeAmount - 1].pos.x;
+            StartGame = true;
+            //InitNebulae(nebula, nebulaeAmount, nebulea);
+            //finishLine = nebulea[nebulaeAmount - 1].pos.x;
         }
 
         if(quitGameButton.MouseOverButton(mousePos) && quitGameButton.Clicked(mousePos))
         {
-            quitGame = true;
+            QuitGame = true;
             WindowShouldClose();
         }
         
         if(restartButton.MouseOverButton(mousePos) && restartButton.Clicked(mousePos))
         {
-            isDead = false;
-            InitNebulae(nebula, nebulaeAmount, nebulea);
-            finishLine = nebulea[nebulaeAmount - 1].pos.x;
+            scarfy.IsDead = false;
+            //InitNebulae(nebula, nebulaeAmount, nebulea);
+            //finishLine = nebulea[nebulaeAmount - 1].pos.x;
         }
         
-        //Ground check
-        if(IsOnGround(scarfyData,windowHeight))
-        {   //Rectangle is on ground
-            isInAir = false;
-            velocity = 0;
-        }
-        else
-        {   // Rectangle is in air
-            isInAir = true;
-            velocity += gravity * deltaTime;
-        }
-
-        // Check for jump
-        if(IsKeyPressed(KEY_SPACE) && !isInAir) velocity += jumpVel;
+       
         
-        //Update scarfy position 
-        scarfyData.pos.y += velocity * deltaTime;
-
-        if(!isInAir)
-        {
-           scarfyData = UpdateAnimData(scarfyData,deltaTime,scarfyData.maxFrame);
-        }
-        
-        for (AnimData nebula : nebulea)
+        /*for (AnimData nebula : nebulea)
         {
             const float pad{50};
             const Rectangle nebRect{
@@ -386,9 +335,9 @@ int main()
             {
                 isDead = true;
             }
-        }
+        }*/
 
-        if(isDead)
+        if(scarfy.IsDead)
         {
             if(!menu.isActive)
             {
@@ -400,11 +349,11 @@ int main()
         }
         else if(menu.isActive)
         {
-            DrawTextureRec(scarfy, scarfyData.rect, scarfyData.pos, WHITE);
+            //DrawTextureRec(scarfy, scarfyData.rect, scarfyData.pos, WHITE);
         }
         else
         {
-            for (int i = 0; i < nebulaeAmount; i++)
+            /*for (int i = 0; i < nebulaeAmount; i++)
             {
                 //Update nebula position
                 nebulea[i].pos.x += nebVel * deltaTime;
@@ -423,13 +372,13 @@ int main()
                 menu.DrawButton(quitGameButton);
             }
 
-            DrawTextureRec(scarfy, scarfyData.rect, scarfyData.pos, WHITE);
+            DrawTextureRec(scarfy, scarfyData.rect, scarfyData.pos, WHITE);*/
         }
 
         if(IsKeyPressed(KEY_ENTER))
         {
             menu.isActive = !menu.isActive;
-            startGame = !startGame;
+            StartGame = !StartGame;
         }
         
         EndDrawing();
@@ -438,8 +387,9 @@ int main()
     UnloadMusicStream(music);
     UnloadSound(button_click_sound);
     UnloadSound(button_hover_sound);
-    UnloadTexture(scarfy);
-    UnloadTexture(nebula);
+    scarfy.Unload_Texture();
+    //UnloadTexture(scarfy);
+    //UnloadTexture(nebula);
     UnloadTexture(farBG);
     UnloadTexture(middleBG);
     UnloadTexture(foreGround);
