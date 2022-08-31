@@ -154,6 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AnimData.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Dapper-dasher.cpp" />
     <ClCompile Include="Menu.cpp" />
@@ -162,6 +163,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnimData.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Menu.h" />
   </ItemGroup>

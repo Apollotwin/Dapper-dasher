@@ -216,7 +216,7 @@ int main()
     
     while (!WindowShouldClose() && !quitGame)
     {
-        if(IsKeyPressed(KEY_A)) playMusic = true;
+        if(IsKeyPressed(KEY_P)) playMusic = !playMusic;
         
         if(playMusic) UpdateMusicStream(music);
         // Delta time (time since the last frame)
