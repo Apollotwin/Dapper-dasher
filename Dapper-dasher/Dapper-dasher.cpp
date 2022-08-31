@@ -1,4 +1,6 @@
 #include <string>
+
+#include "AnimData.h"
 #include "Menu.h"
 #include "raylib.h"
 
@@ -8,35 +10,9 @@ using namespace std;
 const int windowWidth{1350};
 const int windowHeight{1100};
 
-struct AnimData
-{
-    Rectangle rect;
-    Vector2 pos;
-    int frame;
-    int maxFrame;
-    float updateTime;
-    float runningTime;
-};
-
 bool IsOnGround(AnimData data, int windowHeight)
 {
     return  data.pos.y >= windowHeight - data.rect.height;
-}
-
-AnimData UpdateAnimData(AnimData data, float deltaTime, int maxFrame)
-{
-    //Update running time
-    data.runningTime += deltaTime;
-    if(data.runningTime >= data.updateTime)
-    {
-        data.runningTime = 0.0f;
-            
-        //Update animation frame
-        data.rect.x = data.frame * data.rect.width;
-        data.frame++;
-        if(data.frame > maxFrame) data.frame = 0;
-    }
-    return data;
 }
 
 void DrawBackground(const Texture2D farBG, float bgX)
