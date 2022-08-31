@@ -173,6 +173,19 @@
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Nebuala.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Sound\Bzzt.wav" />
+    <Content Include="Sound\Click_button.wav" />
+    <Content Include="Sound\Dapper-dasher_music.wav" />
+    <Content Include="Sound\Hover_button.wav" />
+    <Content Include="textures\12_nebula_spritesheet.png" />
+    <Content Include="textures\back-buildings.png" />
+    <Content Include="textures\far-buildings.png" />
+    <Content Include="textures\foreground.png" />
+    <Content Include="textures\Music_icon.png" />
+    <Content Include="textures\Music_mute_icon.png" />
+    <Content Include="textures\scarfy.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\raylib.4.0.0.7\build\native\raylib.targets" Condition="Exists('..\packages\raylib.4.0.0.7\build\native\raylib.targets')" />

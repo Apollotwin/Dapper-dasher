@@ -17,4 +17,6 @@ public:
 private:
     int winHeight{};
     int gravity{};
+
+    Sound 
 };
