@@ -54,11 +54,6 @@ void DrawForeground(const int windowHeight, const Texture2D foreGround, float fg
     DrawTextureEx(foreGround,fgPos4,0.0, 2.0, WHITE);
 }
 
-void DebugLog(const char* text) 
-{
-    Vector2 txtSize = MeasureTextEx(GetFontDefault(), text,50.f,0.f);
-    DrawText(text, windowWidth/4 - txtSize.x/2,windowHeight/8 * 7, 50.f,WHITE );
-}
 
 
 
@@ -67,7 +62,21 @@ int main()
     InitWindow(windowWidth,windowHeight,"Dapper dasher!");
 
     bool StartGame{false};
+    bool PauseGame{false};
     bool QuitGame{false};
+
+    //Music & Sound
+    InitAudioDevice();
+    float musicVolume{0.7f};
+    float soundVolume{1.f};
+    float lastVolumeValue{musicVolume};
+    Music music = LoadMusicStream("Sound/Dapper-dasher_music.wav");
+    Sound button_click_sound = LoadSound("Sound/Click_button.wav");
+    Sound button_hover_sound = LoadSound("Sound/Hover_button.wav");
+    PlayMusicStream(music);
+    SetMusicVolume(music,musicVolume);
+    SetSoundVolume(button_click_sound,soundVolume);
+    SetSoundVolume(button_hover_sound,soundVolume);
 
     //Background
     const Texture2D farBG = LoadTexture("textures/far-buildings.png");
@@ -80,16 +89,18 @@ int main()
     //Scarfy
     Character scarfy{
         windowWidth,windowHeight,
-        LoadTexture("textures/scarfy.png"),
-        6,1, -600, gravity
+        {LoadTexture("textures/scarfy_run.png"),6,1,windowWidth,windowHeight,Running},
+        {LoadTexture("textures/scarfy_idle.png"),1,1,windowWidth,windowHeight,Idle},
+        {LoadTexture("textures/scarfy_death.png"),6,1,windowWidth,windowHeight,Dead},
+        -600 ,gravity
     };
+
+    scarfy.SetAnimationData(scarfy.idleAnimData);
     
     //Nebula
     Nebula nebula{windowWidth,windowHeight};
     int nebulaeAmount = 15;
     //float finishLine{nebulea[nebulaeAmount - 1].pos.x};
-    
-    
     
     //Menu & Buttons
     Menu menu(windowWidth,windowHeight,"Dapper Dasher", true);
@@ -111,18 +122,7 @@ int main()
     string credits = "Music by Simon Magnusson";
     float textLength = static_cast<float> (MeasureText(credits.c_str(), 20));
     
-    //Music & Sound
-    InitAudioDevice();
-    float musicVolume{0.7f};
-    float soundVolume{1.f};
-    float lastVolumeValue{musicVolume};
-    Music music = LoadMusicStream("Sound/Dapper-dasher_music.wav");
-    Sound button_click_sound = LoadSound("Sound/Click_button.wav");
-    Sound button_hover_sound = LoadSound("Sound/Hover_button.wav");
-    PlayMusicStream(music);
-    SetMusicVolume(music,musicVolume);
-    SetSoundVolume(button_click_sound,soundVolume);
-    SetSoundVolume(button_hover_sound,soundVolume);
+    
 
     //Music icon
     Texture2D musicText;
@@ -156,21 +156,25 @@ int main()
     
     SetTargetFPS(60);
 
-    bool playMusic{false};
+    bool playMusic{true};
     
     while (!WindowShouldClose() && !scarfy.QuitGame)
     {
         if(IsKeyPressed(KEY_P)) playMusic = !playMusic;
         
         if(playMusic) UpdateMusicStream(music);
+        
         // Delta time (time since the last frame)
-        const float deltaTime{GetFrameTime()};
+        float deltaTime{GetFrameTime()};
+        
         Vector2 mousePos = GetMousePosition();
         
         BeginDrawing();
         ClearBackground(PURPLE);
 
-        if(!scarfy.IsDead)
+        if(StartGame && !scarfy.IsDead && scarfy.GetState() != Running) scarfy.SetAnimationData(scarfy.runAnimData);
+
+        if(StartGame && !scarfy.IsDead)
         {
             //Update background position
             bgX -= 20 * deltaTime;
@@ -262,7 +266,7 @@ int main()
             SetMusicVolume(music, musicVolume);
             musicText = musicIcon;
         }
-
+        
         if(sliderButton.MouseOverButton(mousePos) || sliderButton.Down(mousePos)) // Change background color if mouse is over
         {
             DrawRectangle(slideRailPos.x,slideRailPos.y,slideRail.width,slideRail.height, WHITE);
@@ -349,7 +353,7 @@ int main()
         }
         else if(menu.isActive)
         {
-            //DrawTextureRec(scarfy, scarfyData.rect, scarfyData.pos, WHITE);
+            scarfy.SetAnimationData(scarfy.idleAnimData);
         }
         else
         {
@@ -387,7 +391,7 @@ int main()
     UnloadMusicStream(music);
     UnloadSound(button_click_sound);
     UnloadSound(button_hover_sound);
-    scarfy.Unload_Texture();
+    
     //UnloadTexture(scarfy);
     //UnloadTexture(nebula);
     UnloadTexture(farBG);

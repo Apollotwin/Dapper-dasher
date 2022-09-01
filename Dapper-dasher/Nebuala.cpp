@@ -2,7 +2,7 @@
 
 Nebula::Nebula(int windowWidth, int windowHeight)
 {
-    nebulaAnimationData.rect.x = 0.0;
+    /*nebulaAnimationData.rect.x = 0.0;
     nebulaAnimationData.rect.y = 0.0;
     nebulaAnimationData.rect.width = nebula.width/8;
     nebulaAnimationData.rect.height = nebula.height/8;
@@ -11,7 +11,7 @@ Nebula::Nebula(int windowWidth, int windowHeight)
     nebulaAnimationData.frame = 0;
     nebulaAnimationData.maxFrame = 7;
     nebulaAnimationData.runningTime = 1.0/12.0;
-    nebulaAnimationData.updateTime = 0.0;
+    nebulaAnimationData.updateTime = 0.0;*/
 }
 
 

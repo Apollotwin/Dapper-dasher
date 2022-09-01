@@ -9,6 +9,6 @@ public:
     Nebula(int windowWidth, int windowHeight);
 private:
     const Texture2D nebula = LoadTexture("textures/12_nebula_spritesheet.png");
-    AnimData nebulaAnimationData{};
+    //AnimData nebulaAnimationData{};
     int nebVel{-200};
 };
