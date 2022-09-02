@@ -152,15 +152,18 @@ int main()
     //Start button
     Button startGameButton{"Start Game", windowWidth,windowHeight,200,100,100,DARKPURPLE,WHITE,DARKPURPLE};
     startGameButton.UpdateTextPos(40.f);
+    startGameButton.IsActive = true;
 
     //Quit button
     Button quitGameButton{"Quit", windowWidth,windowHeight,200,100,startGameButton.fontSize,DARKPURPLE,WHITE,DARKPURPLE};
     quitGameButton.rect.y = startGameButton.rect.y + startGameButton.rect.height + 20.f;
     quitGameButton.UpdateTextPos(0.f);
+    quitGameButton.IsActive = true;
 
     //Restart button
     Button restartButton{"Restart Game", windowWidth,windowHeight,200,100,100,DARKPURPLE,WHITE,DARKPURPLE};
     restartButton.UpdateTextPos(40.0f);
+    restartButton.IsActive = false;
 
     //Credits
     string credits = "Music by Simon Magnusson";
@@ -252,18 +255,19 @@ int main()
         //Draw Credit text
         DrawText(credits.c_str(), windowWidth/2 - textLength/2, 20.f, 20,WHITE );
 
+        //Character Update
         scarfy.Tick(deltaTime);
-        
 
-        //Draw Music icons & buttons
+        //Clamp Music volume
         if(musicVolume > 1.f) musicVolume = 1.f;
         if(musicVolume < 0.f) musicVolume = 0.f;
 
+        //Clamp Sound Volume
         if(soundVolume > 1.f) soundVolume = 1.f;
         if(soundVolume < 0.f) soundVolume = 0.f;
         
-
-        if(sliderButton.Down(mousePos))
+        //Check if slider is pressed & Update slider position, music volume & sound volume
+        if(sliderButton.Down(mousePos) && !sliderButton.Released())
         {
             if(mousePos.x < slideRailPos.x)
             {
@@ -286,7 +290,8 @@ int main()
             SetSoundVolume(button_click_sound,soundVolume);
             SetSoundVolume(button_hover_sound,soundVolume);
         }
-        
+
+        //Check if mute button is pressed & mute music if pressed
         if(musicButton.MouseOverButton(mousePos) && musicButton.Clicked(mousePos))
         {
             PlaySound(button_click_sound);
@@ -294,18 +299,19 @@ int main()
             musicVolume = lastVolumeValue;
         }
 
+        //Check if music should be muted
         if(muteMusic || musicVolume <= 0.f)
         {
             musicVolume = 0.f;
             SetMusicVolume(music, musicVolume);
             musicText = musicMuteIcon;
-        }
-        else
+        }else
         {
             SetMusicVolume(music, musicVolume);
             musicText = musicIcon;
         }
-        
+
+        //Animate slider button
         if(sliderButton.MouseOverButton(mousePos) || sliderButton.Down(mousePos)) // Change background color if mouse is over
         {
             DrawRectangle(slideRailPos.x,slideRailPos.y,slideRail.width,slideRail.height, WHITE);
@@ -320,7 +326,8 @@ int main()
             DrawRectangle(slideRailPos.x + sliderPad,slideRailPos.y + sliderPad,slideRail.width,slideRail.height, WHITE);
             DrawCircle(volumeSliderPosWhite.x + sliderPad/2.f,volumeSliderPosWhite.y + sliderPad/2.f, circleRad, WHITE);
         }
-        
+
+        //Animate music button
         if(musicButton.MouseOverButton(mousePos)) // Change background color if mouse is over
         {
             DrawTexture(musicText,musicIconPosWhite.x,musicIconPosWhite.y, WHITE);
@@ -332,30 +339,40 @@ int main()
             DrawTexture(musicText,musicIconPosPurple.x,musicIconPosPurple.y, WHITE);
         }
 
+        //Show menu if we have not pushed start game
         menu.Show(!StartGame,startGameButton, quitGameButton);
-        
-        if(startGameButton.MouseOverButton(mousePos) && startGameButton.Clicked(mousePos))
+
+        //Check if we click start game button
+        if(startGameButton.MouseOverButton(mousePos) && startGameButton.Clicked(mousePos) && startGameButton.IsActive)
         {
             PlaySound(button_click_sound);
             StartGame = true;
         }
 
-        if(quitGameButton.MouseOverButton(mousePos) && quitGameButton.Clicked(mousePos))
+        //Check if we click quit button
+        if(quitGameButton.MouseOverButton(mousePos) && quitGameButton.Clicked(mousePos) && quitGameButton.IsActive)
         {
             QuitGame = true;
             WindowShouldClose();
         }
-        
-        if(restartButton.MouseOverButton(mousePos) && restartButton.Clicked(mousePos))
+
+        //Restart game button
+        if(restartButton.MouseOverButton(mousePos) && restartButton.Clicked(mousePos) && restartButton.IsActive || restartButton.IsActive && IsKeyPressed(KEY_ENTER) && scarfy.IsDead)
         {
             scarfy.IsDead = false;
+            StartGame = false;
+            startGameButton.IsActive = true;
+            restartButton.IsActive = false;
 
             for (auto &neb1 : nebulea)
             {
                 neb1.ResetToInitPos();
             }
+
+            finishLine = nebulea[nebulaeAmount - 1].GetPosition().x;
         }
-        
+
+        //Collision check
         if(!scarfy.IsDead && StartGame)
         {
             for (auto &neb : nebulea)
@@ -371,21 +388,24 @@ int main()
             }
         }
 
+        //Show Game over if scarfy is dead
         if(scarfy.IsDead)
         {
             if(!menu.isActive)
             {
                 DrawText("GAME OVER", windowWidth/2 - MeasureText("GAME OVER",menu.fontSize)/2,windowHeight/8,menu.fontSize, WHITE);
                 DrawText("GAME OVER", windowWidth/2 - MeasureText("GAME OVER",menu.fontSize)/2 + 2,windowHeight/8 + 2,menu.fontSize, DARKPURPLE);
+                startGameButton.IsActive = false;
+                restartButton.IsActive = true;
                 menu.DrawButton(restartButton);
                 menu.DrawButton(quitGameButton);
             }
         }
-        else if(menu.isActive)
+        else if(menu.isActive) //Set scarfy to idle if we are in startmenu
         {
             scarfy.SetAnimation(scarfy.idle_animation);
         }
-        else
+        else //Count down finishline
         {
             finishLine += static_cast<float>(nebula.GetVelocity()) * deltaTime;
             
@@ -393,6 +413,8 @@ int main()
             {
                 DrawText("YOU WIN!", windowWidth/2 - MeasureText("YOU WIN!",menu.fontSize)/2,windowHeight/8,menu.fontSize, WHITE);
                 DrawText("YOU WIN!", windowWidth/2 - MeasureText("YOU WIN!",menu.fontSize)/2 + 2,windowHeight/8 + 2,menu.fontSize, DARKPURPLE);
+                startGameButton.IsActive = false;
+                restartButton.IsActive = true;
                 menu.DrawButton(restartButton);
                 menu.DrawButton(quitGameButton);
             }

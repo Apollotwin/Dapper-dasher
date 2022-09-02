@@ -9,6 +9,7 @@ struct Button
     void ChangeColor(Color color);
     bool Clicked(Vector2 mousePos);
     bool Down(Vector2 mousePos);
+    bool Released();
     void UpdateTextPos(float pad);
     void UpdatePosition(Vector2 newPos);
 
@@ -25,5 +26,6 @@ struct Button
     Rectangle rect;
     bool playClickSound{true};
     bool playHoverSound{true};
+    bool IsActive{true};
     
 };

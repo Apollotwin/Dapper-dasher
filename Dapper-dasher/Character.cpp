@@ -12,17 +12,10 @@ Character::Character(int windowWidth, int windowHeight,AnimData run_anim_data, A
     winWidth = windowWidth;
     winHeight = windowHeight;
     gravity = Gravity;
-
-    SetSoundPitch(jumpSound, -2);
-    SetSoundPitch(landSound, -2);
 }
 
 void Character::Tick(float deltaTime)
 {
-    std::string velocity = std::to_string(Velocity);
-    debugger.DebugLog(velocity,winWidth,winHeight);
-
-    
     if(IsKeyPressed(KEY_BACKSPACE))
     {
         IsDead = true;
@@ -36,6 +29,7 @@ void Character::Tick(float deltaTime)
         IsInAir = false;
         if(Velocity > 0 )
         {
+            SetSoundPitch(landSound, -25);
             PlaySound(landSound);
             PlaySound(footsteps[0]);
             Velocity = 0;
@@ -52,6 +46,7 @@ void Character::Tick(float deltaTime)
     if(IsKeyPressed(KEY_SPACE) && !IsInAir && !IsDead && GetState() != Idle)
     {
         Velocity += JumpVelocity;
+        SetSoundPitch(jumpSound, -100.f);
         PlaySound(jumpSound);
         PlaySound(footsteps[1]);
     }

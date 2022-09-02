@@ -56,8 +56,14 @@ bool Button::Down(Vector2 mousePos)
         return true;
     }
     
-    return false;
+    return Released();
 }
+
+bool Button::Released()
+{
+    return IsMouseButtonReleased(MOUSE_BUTTON_LEFT);
+}
+
 
 void Button::UpdateTextPos(float pad)
 {
