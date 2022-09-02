@@ -1,26 +1,28 @@
 ﻿#include "Character.h"
-
+#include <string.h>
 #include <string>
 
-#include "Debugger.h"
-
-Character::Character(int windowWidth, int windowHeight,AnimData run_anim_data, AnimData idle_anim_data, AnimData death_anim_data,int jumpHeight, int Gravity ):
-    scarfy_animation(idle_anim_data),
-    runAnimData(run_anim_data),
-    idleAnimData(idle_anim_data),
-    deathAnimData(death_anim_data)
+Character::Character(int windowWidth, int windowHeight,AnimData run_anim_data, AnimData idle_anim_data, AnimData death_anim_data,float jumpHeight, float Gravity ):
+    run_animation(run_anim_data),
+    idle_animation(idle_anim_data),
+    death_animation(death_anim_data),
+    scarfy_animation(idle_anim_data)
 {
-    JumpVelocity = static_cast<float>(jumpHeight);
+    JumpVelocity = jumpHeight;
     winWidth = windowWidth;
     winHeight = windowHeight;
     gravity = Gravity;
+
+    SetSoundPitch(jumpSound, -2);
+    SetSoundPitch(landSound, -2);
 }
 
 void Character::Tick(float deltaTime)
 {
-    //Update character position 
-    scarfy_animation.pos.y += Velocity * deltaTime;
+    std::string velocity = std::to_string(Velocity);
+    debugger.DebugLog(velocity,winWidth,winHeight);
 
+    
     if(IsKeyPressed(KEY_BACKSPACE))
     {
         IsDead = true;
@@ -43,7 +45,7 @@ void Character::Tick(float deltaTime)
     {   // Rectangle is in air
         IsInAir = true;
         FreezeFrame = true;
-        Velocity += static_cast<float>(gravity) * deltaTime;
+        Velocity += gravity * deltaTime;
     }
 
     // Check for jump
@@ -54,7 +56,10 @@ void Character::Tick(float deltaTime)
         PlaySound(footsteps[1]);
     }
 
-    if(IsDead && GetState() != Dead) SetAnimationData(deathAnimData);
+    if(IsDead && GetState() != Dead) SetAnimation(death_animation);
+
+    //Update character position 
+    scarfy_animation.pos.y += Velocity * deltaTime;
 
     UpdateAnimation(deltaTime);
 }
@@ -136,9 +141,10 @@ void Character::UpdateAnimation(float deltaTime)
     }
     
     DrawTextureRec(scarfy_animation.texture,scarfy_animation.rect,scarfy_animation.pos,WHITE);
+    UpdateCollitionRect();
 }
 
-void Character::SetAnimationData(AnimData anim_data)
+void Character::SetAnimation(AnimData anim_data)
 {
     scarfy_animation = anim_data;
 }
@@ -153,11 +159,59 @@ State Character::GetState()
     return scarfy_animation.animationState;
 }
 
+Rectangle Character::GetRect()
+{
+    return scarfy_animation.rect;
+}
+
+Rectangle Character::GetCollisionRect()
+{
+    return collisionRect;
+}
+
+Vector2 Character::GetPosition()
+{
+    return scarfy_animation.pos;
+}
+
+void Character::SetPosition(float x, float y)
+{
+    scarfy_animation.pos.x = x;
+    scarfy_animation.pos.y = y;
+}
+
 int index = 0;
 
 
 bool Character::IsOnGround()
 {
     return scarfy_animation.pos.y >= static_cast<float>(winHeight) - scarfy_animation.rect.height;
+}
+
+void Character::Unload()
+{
+    UnloadSound(jumpSound);
+    UnloadSound(landSound);
+    UnloadSound(deathSound);
+    
+    for (const auto sound : footsteps)
+    {
+        UnloadSound(sound);
+    }
+
+    UnloadTexture(run_animation.texture);
+    UnloadTexture(idle_animation.texture);
+    UnloadTexture(death_animation.texture);
+}
+
+void Character::UpdateCollitionRect()
+{
+    const float pad{50};
+    collisionRect = {
+        scarfy_animation.pos.x + pad/2,
+        scarfy_animation.pos.y,
+        scarfy_animation.rect.width - pad,
+        scarfy_animation.rect.height
+    };
 }
 

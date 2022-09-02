@@ -2,7 +2,7 @@
 #include "AnimData.h"
 #include "BaseCharacter.h"
 #include "Debugger.h"
-#include "TextureData.h"
+
 
 class Character 
 {
@@ -13,42 +13,48 @@ public:
         AnimData run_anim_data,
         AnimData idle_anim_data,
         AnimData death_anim_data,
-        int jumpHeight,
-        int Gravity);
+        float jumpHeight,
+        float Gravity);
     
     void Tick(float deltaTime);
     void UpdateAnimation(float deltaTime);
-    void SetAnimationData(AnimData anim_data);
+    void SetAnimation(AnimData anim_data);
     void PlayDeathSound();
     State GetState();
+    Rectangle GetRect();
+    Rectangle GetCollisionRect();
+    Vector2 GetPosition();
+    void SetPosition(float x, float y);
     bool IsOnGround();
-    
+    void Unload();
+
+    float Velocity{0};
+    float JumpVelocity{-600};
     bool IsInAir{false};
     bool IsDead{false};
     bool StartGame{false};
     bool QuitGame{false};
-    float Velocity{0};
-    float JumpVelocity{-600};
     bool FreezeFrame{false};
     
-    AnimData runAnimData;
-    AnimData idleAnimData;
-    AnimData deathAnimData;
+    AnimData run_animation;
+    AnimData idle_animation;
+    AnimData death_animation;
+
+    Sound deathSound { LoadSound("Sound/Death.wav") };
     
 private:
-    AnimData scarfy_animation;
+    Debugger debugger{};
     int winWidth{};
     int winHeight{};
-    int gravity{};
-    Debugger debugger{};
-    Rectangle rect{};
-    Vector2 pos{};
+    float gravity{};
+    Rectangle collisionRect{};
+
+    void UpdateCollitionRect();
 
     //Sound
+    int footstepIndex{0};
     Sound jumpSound { LoadSound("Sound/Jump_vox.wav") };
     Sound landSound { LoadSound("Sound/Land_vox.wav") };
-    Sound deathSound { LoadSound("Sound/Death.wav") };
-    int footstepIndex{0};
     Sound footsteps[6] = {
         LoadSound("Sound/Footstep_0.wav"),
         LoadSound("Sound/Footstep_1.wav"),
@@ -59,6 +65,7 @@ private:
     };
     
     //Animation
+    AnimData scarfy_animation;
     int frame{0};
     int maxFrame{5};
     float runningTime{0.0f};

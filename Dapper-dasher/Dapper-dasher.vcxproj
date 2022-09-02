@@ -162,7 +162,6 @@
     <ClCompile Include="Debugger.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Nebuala.cpp" />
-    <ClCompile Include="TextureData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -175,7 +174,6 @@
     <ClInclude Include="Debugger.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Nebuala.h" />
-    <ClInclude Include="TextureData.h" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Sound\Bzzt.wav" />

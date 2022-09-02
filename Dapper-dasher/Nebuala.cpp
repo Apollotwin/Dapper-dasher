@@ -1,34 +1,95 @@
 ﻿#include "Nebuala.h"
 
-Nebula::Nebula(int windowWidth, int windowHeight)
+
+Nebula::Nebula()
+= default;
+
+void Nebula::InitNebula(float gapDistance ,int index)
 {
-    /*nebulaAnimationData.rect.x = 0.0;
-    nebulaAnimationData.rect.y = 0.0;
-    nebulaAnimationData.rect.width = nebula.width/8;
-    nebulaAnimationData.rect.height = nebula.height/8;
-    nebulaAnimationData.pos.y = windowHeight - nebula.height/8;
-    nebulaAnimationData.pos.x = windowWidth + (300 * 0);
-    nebulaAnimationData.frame = 0;
-    nebulaAnimationData.maxFrame = 7;
-    nebulaAnimationData.runningTime = 1.0/12.0;
-    nebulaAnimationData.updateTime = 0.0;*/
+    if(index <= 1)
+        nebula_animation.pos.x += gapDistance;
+    else
+        nebula_animation.pos.x += gapDistance * index;
+
+    initPos.x = nebula_animation.pos.x;
+
+    UpdateCollisionRect();
 }
 
+void Nebula::Tick(float deltaTime)
+{
+    UpdateAnimation(deltaTime);
+    UpdateCollisionRect();
+}
 
-// void Nebula::InitNebulae(const Texture2D& nebula,const int nebulaeAmount, AnimData(nebulea)[15])
-// {
-//     for (int i = 0; i < nebulaeAmount; i++)
-//     {
-//         nebulea[i].rect.x = 0.0;
-//         nebulea[i].rect.y = 0.0;
-//         nebulea[i].rect.width = nebula.width/8;
-//         nebulea[i].rect.height = nebula.height/8;
-//         nebulea[i].pos.y = windowHeight - nebula.height/8;
-//         nebulea[i].pos.x = windowWidth + (300 * i);
-//         nebulea[i].frame = i;
-//         nebulea[i].maxFrame = 7;
-//         nebulea[i].runningTime = 1.0/12.0;
-//         nebulea[i].updateTime = 0.0;
-//     }
-// }
+void Nebula::SetAnimation(AnimData animation)
+{
+    nebula_animation = animation;
+}
+
+void Nebula::UpdateAnimation(float deltaTime)
+{
+    nebula_animation.pos.x += static_cast<float>(nebVel) * deltaTime;
+    
+    //Update running time
+    nebula_animation.runningTime += deltaTime;
+    if(nebula_animation.runningTime >= nebula_animation.updateTime)
+    {
+        nebula_animation.runningTime = 0.0f;
+        
+        //Update animation frame
+        nebula_animation.rect.x = static_cast<float>(nebula_animation.frame) * nebula_animation.rect.width;
+        nebula_animation.frame++;
+        if(nebula_animation.frame > nebula_animation.maxFrame) nebula_animation.frame = 0;
+    }
+
+    DrawTextureRec(nebula_animation.texture,nebula_animation.rect,nebula_animation.pos,WHITE);
+}
+
+void Nebula::UpdateCollisionRect()
+{
+    const float pad{50};
+    collisionRect = {
+        nebula_animation.pos.x + pad/2,
+        nebula_animation.pos.y + pad/2,
+        nebula_animation.rect.width - pad,
+        nebula_animation.rect.height
+        };
+}
+
+Vector2 Nebula::GetPosition()
+{
+    return nebula_animation.pos;
+}
+
+void Nebula::SetPosition(float x, float y)
+{
+    nebula_animation.pos.x = x;
+    nebula_animation.pos.y = y;
+}
+
+Rectangle Nebula::GetRect()
+{
+    return nebula_animation.rect;
+}
+
+Rectangle Nebula::GetCollisionRect()
+{
+    return collisionRect;
+}
+
+int Nebula::GetVelocity()
+{
+    return nebVel;
+}
+
+void Nebula::Unload()
+{
+    UnloadTexture(nebula_animation.texture);
+}
+
+void Nebula::ResetToInitPos()
+{
+    nebula_animation.pos.x = initPos.x;
+}
 

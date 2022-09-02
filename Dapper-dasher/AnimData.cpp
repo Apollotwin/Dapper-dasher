@@ -1,20 +1,27 @@
 ﻿#include "AnimData.h"
 
-AnimData::AnimData(Texture2D texture, int picWidth, int picHeight, int winWidth, int winHeight, State animState) : texture(texture), animationState(animState)
+void AnimData::InitAnimData(int windowWidth, int windowHeight,Texture2D texture2D ,Anim_Data_Position position,State animation_state ,int picWidth,int picHeight)
 {
+    texture = texture2D;
     rect.width = static_cast<float>(texture.width)/static_cast<float>(picWidth);
     rect.height = static_cast<float>(texture.height)/static_cast<float>(picHeight);
     rect.x = 0;
     rect.y = 0;
-    pos.x = static_cast<float>(winWidth) / 2 - rect.width / 2;
-    pos.y = static_cast<float>(winHeight) - rect.height; 
+    
+    if(position == Center) pos.x = static_cast<float>(windowWidth)/2 - rect.width/2;
+    if(position == Off_Screen_Right) pos.x = static_cast<float>(windowWidth);
+    if(position == Off_Screen_Left) pos.x = rect.width * -1;
+    
+    pos.y = static_cast<float>(windowHeight) - rect.height;
+    
     frame = 0;
     maxFrame = (picWidth * picHeight) - 1;
     runningTime = 0.0f;
     updateTime = 1.f/12.0f;
+    animationState = animation_state;
 }
 
-void AnimData::UpdateAnimData(AnimData data, float deltaTime)
+AnimData AnimData::UpdateAnimData(AnimData data, float deltaTime)
 {
     //Update running time
     data.runningTime += deltaTime;
@@ -27,4 +34,5 @@ void AnimData::UpdateAnimData(AnimData data, float deltaTime)
         data.frame++;
         if(data.frame > data.maxFrame) data.frame = 0;
     }
+    return data;
 }
