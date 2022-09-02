@@ -12,6 +12,15 @@ using namespace std;
 const int windowWidth{1350};
 const int windowHeight{1100};
 
+//Game bools
+bool StartGame{false};
+bool PauseGame{false};
+bool QuitGame{false};
+
+//Player score
+int PlayerHighScore{};
+int PlayerScore{};
+
 // acceleration due to gravity (pixels/s)/s
 const float gravity{1000.f};
 
@@ -54,16 +63,16 @@ void DrawForeground(const int windowHeight, const Texture2D foreGround, float fg
     DrawTextureEx(foreGround,fgPos4,0.0, 2.0, WHITE);
 }
 
-
-
+void DrawParallax(const int winHeight,const Texture2D background, float bgx, const Texture2D middleground, float mgx, const Texture2D foreground, float fgx)
+{
+    DrawBackground(background,bgx);
+    DrawMiddleGround(winHeight,middleground,mgx);
+    DrawForeground(winHeight,foreground,fgx);
+}
 
 int main()
 {
     InitWindow(windowWidth,windowHeight,"Dapper dasher!");
-
-    bool StartGame{false};
-    bool PauseGame{false};
-    bool QuitGame{false};
 
 #pragma region Music_&_Sound
     //Music & Sound
@@ -134,7 +143,6 @@ int main()
     float finishLine{nebulea[nebulaeAmount - 1].GetPosition().x};
 
 #pragma endregion Nebula
-    
 
 #pragma region UI
     
@@ -210,6 +218,7 @@ int main()
 
         if(StartGame && !scarfy.IsDead && scarfy.GetState() != Running) scarfy.SetAnimation(scarfy.run_animation);
 
+        //Update background
         if(StartGame && !scarfy.IsDead)
         {
             //Update background position
@@ -237,14 +246,8 @@ int main()
             }
         }
 
-        //Draw far-background
-        DrawBackground(farBG, bgX);
-
-        //Draw middle ground
-        DrawMiddleGround(windowHeight, middleBG, mdgX);
-
-        //Draw foreground
-        DrawForeground(windowHeight, foreGround, fgX);
+        //Draw Background
+        DrawParallax(windowHeight,farBG,bgX,middleBG,mdgX,foreGround,fgX);
 
         //Draw Credit text
         DrawText(credits.c_str(), windowWidth/2 - textLength/2, 20.f, 20,WHITE );
