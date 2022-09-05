@@ -8,6 +8,7 @@ struct Menu
     void Show(bool isActive, Button button1, Button button2);
     void AddButton(Button button);
     void DrawButton(Button button);
+    void DrawTitle(bool isActive);
     
     const char* title;
     Vector2 pos;

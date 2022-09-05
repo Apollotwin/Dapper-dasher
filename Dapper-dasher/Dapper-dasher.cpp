@@ -1,10 +1,13 @@
+#include <iostream>
 #include <string>
 
 #include "AnimData.h"
 #include "Character.h"
+#include "InputTextField.h"
 #include "Menu.h"
 #include "Nebuala.h"
 #include "raylib.h"
+#include "Serializing.h"
 
 using namespace std;
 
@@ -74,6 +77,26 @@ int main()
 {
     InitWindow(windowWidth,windowHeight,"Dapper dasher!");
 
+    HighScoreData high_score_data[10];
+
+    string playerName;
+
+    bool playerEntry = false;
+    
+    
+
+    //Serialize High score
+    /*Player testPlayer = {"TestPlayer", 124};
+
+    for (int i = 0; i < 10; i++)
+    {
+        high_score_data->players.push_back(testPlayer);
+    }
+
+    json json_data;
+    to_json(json_data, *high_score_data);
+    SaveFileText("HighScoresData.json", const_cast<char*>(to_string(json_data).c_str()));*/
+
 #pragma region Music_&_Sound
     //Music & Sound
     InitAudioDevice();
@@ -89,13 +112,14 @@ int main()
     SetSoundVolume(button_hover_sound,soundVolume);
 #pragma endregion Music_&_Sound
     
-    //Background
+#pragma region Background textures & variables    //Background
     const Texture2D farBG = LoadTexture("textures/far-buildings.png");
     const Texture2D middleBG = LoadTexture("textures/back-buildings.png");
     const Texture2D foreGround = LoadTexture("textures/foreground.png");
     float bgX{};
     float mdgX{};
     float fgX{};
+#pragma endregion 
 
 #pragma region Scarfy
 
@@ -145,6 +169,8 @@ int main()
 #pragma endregion Nebula
 
 #pragma region UI
+    //Input Text field
+    InputTextField inputTextField{windowWidth,windowHeight, 2, 8};
     
     //Menu & Buttons
     Menu menu(windowWidth,windowHeight,"Dapper Dasher", true);
@@ -255,8 +281,14 @@ int main()
         //Draw Credit text
         DrawText(credits.c_str(), windowWidth/2 - textLength/2, 20.f, 20,WHITE );
 
+        //Draw Title
+        menu.DrawTitle(true);
+        
+        //Draw Input field & Check get input
+        inputTextField.Update(deltaTime);
+
         //Character Update
-        scarfy.Tick(deltaTime);
+        if(playerEntry) scarfy.Tick(deltaTime);
 
         //Clamp Music volume
         if(musicVolume > 1.f) musicVolume = 1.f;
@@ -340,24 +372,24 @@ int main()
         }
 
         //Show menu if we have not pushed start game
-        menu.Show(!StartGame,startGameButton, quitGameButton);
+        if(playerEntry) menu.Show(!StartGame,startGameButton, quitGameButton);
 
         //Check if we click start game button
-        if(startGameButton.MouseOverButton(mousePos) && startGameButton.Clicked(mousePos) && startGameButton.IsActive)
+        if(playerEntry && startGameButton.MouseOverButton(mousePos) && startGameButton.Clicked(mousePos) && startGameButton.IsActive)
         {
             PlaySound(button_click_sound);
             StartGame = true;
         }
 
         //Check if we click quit button
-        if(quitGameButton.MouseOverButton(mousePos) && quitGameButton.Clicked(mousePos) && quitGameButton.IsActive)
+        if(playerEntry && quitGameButton.MouseOverButton(mousePos) && quitGameButton.Clicked(mousePos) && quitGameButton.IsActive)
         {
             QuitGame = true;
             WindowShouldClose();
         }
 
         //Restart game button
-        if(restartButton.MouseOverButton(mousePos) && restartButton.Clicked(mousePos) && restartButton.IsActive || restartButton.IsActive && IsKeyPressed(KEY_ENTER) && scarfy.IsDead)
+        if(playerEntry && restartButton.MouseOverButton(mousePos) && restartButton.Clicked(mousePos) && restartButton.IsActive || restartButton.IsActive && IsKeyPressed(KEY_ENTER) && scarfy.IsDead)
         {
             scarfy.IsDead = false;
             StartGame = false;
@@ -373,7 +405,7 @@ int main()
         }
 
         //Collision check
-        if(!scarfy.IsDead && StartGame)
+        if(playerEntry && !scarfy.IsDead && StartGame)
         {
             for (auto &neb : nebulea)
             {
@@ -401,13 +433,13 @@ int main()
                 menu.DrawButton(quitGameButton);
             }
         }
-        else if(menu.isActive) //Set scarfy to idle if we are in startmenu
+        else if(playerEntry && menu.isActive) //Set scarfy to idle if we are in startmenu
         {
             scarfy.SetAnimation(scarfy.idle_animation);
         }
         else //Count down finishline
         {
-            finishLine += static_cast<float>(nebula.GetVelocity()) * deltaTime;
+            if(playerEntry && StartGame) finishLine += static_cast<float>(nebula.GetVelocity()) * deltaTime;
             
             if(finishLine < scarfy.GetPosition().x)
             {
@@ -420,7 +452,7 @@ int main()
             }
         }
 
-        if(IsKeyPressed(KEY_ENTER) && !scarfy.IsDead)
+        if(playerEntry && IsKeyPressed(KEY_ENTER) && !scarfy.IsDead)
         {
             menu.isActive = !menu.isActive;
             StartGame = !StartGame;

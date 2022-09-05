@@ -37,6 +37,13 @@ void Menu::DrawButton(Button button)
     DrawText(button.text, button.txt_pos.x, button.txt_pos.y, button.fontSize, button.textColor);
 }
 
+void Menu::DrawTitle(bool isActive)
+{
+    if(!isActive) return;
+    DrawText(title,pos.x,pos.y,fontSize,WHITE);
+    DrawText(title,pos.x + 2,pos.y + 2,fontSize,DARKPURPLE);
+}
+
 
 /*void Menu::AddButton()
 {
