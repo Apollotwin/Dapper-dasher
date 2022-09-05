@@ -30,3 +30,10 @@
 *.exe
 *.out
 *.app
+Dapper-dasher/x64/Debug/Dapper-dasher.ilk
+Dapper-dasher/x64/Debug/Dapper-dasher.tlog/Dapper-dasher.write.1u.tlog
+Dapper-dasher/x64/Debug/Dapper-dasher.tlog/link.read.1.tlog
+Dapper-dasher/x64/Debug/Dapper-dasher.tlog/link.write.1.tlog
+Dapper-dasher/x64/Debug/vc142.idb
+Dapper-dasher/x64/Debug/vc142.pdb
+x64/Debug/Dapper-dasher.pdb
