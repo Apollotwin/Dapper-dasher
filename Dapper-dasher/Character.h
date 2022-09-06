@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "AnimData.h"
-#include "BaseCharacter.h"
 #include "Debugger.h"
 
 

@@ -155,7 +155,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AnimData.cpp" />
-    <ClCompile Include="BaseCharacter.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="Dapper-dasher.cpp" />
@@ -170,7 +169,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimData.h" />
-    <ClInclude Include="BaseCharacter.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="Debugger.h" />
@@ -181,30 +179,78 @@
     <ClInclude Include="Serializing.h" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="HighScoresData.txt" />
-    <Content Include="Sound\Bzzt.wav" />
-    <Content Include="Sound\Click_button.wav" />
-    <Content Include="Sound\Dapper-dasher_music.wav" />
-    <Content Include="Sound\Death.wav" />
-    <Content Include="Sound\Jump.wav" />
-    <Content Include="Sound\Footstep_0.wav" />
-    <Content Include="Sound\Footstep_1.wav" />
-    <Content Include="Sound\Footstep_2.wav" />
-    <Content Include="Sound\Footstep_3.wav" />
-    <Content Include="Sound\Footstep_4.wav" />
-    <Content Include="Sound\Footstep_5.wav" />
-    <Content Include="Sound\Hover_button.wav" />
-    <Content Include="Sound\Jump_vox.wav" />
-    <Content Include="Sound\Land_vox.wav" />
-    <Content Include="textures\12_nebula_spritesheet.png" />
-    <Content Include="textures\back-buildings.png" />
-    <Content Include="textures\far-buildings.png" />
-    <Content Include="textures\foreground.png" />
-    <Content Include="textures\Music_icon.png" />
-    <Content Include="textures\Music_mute_icon.png" />
-    <Content Include="textures\scarfy_run.png" />
-    <Content Include="textures\scarfy_death.png" />
-    <Content Include="textures\scarfy_idle.png" />
+    <Content Include="HighScoresData.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sound\Bzzt.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sound\Click_button.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sound\Dapper-dasher_music.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sound\Death.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sound\Jump.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sound\Footstep_0.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sound\Footstep_1.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sound\Footstep_2.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sound\Footstep_3.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sound\Footstep_4.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sound\Footstep_5.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sound\Hover_button.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sound\Jump_vox.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sound\Land_vox.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="textures\12_nebula_spritesheet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="textures\back-buildings.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="textures\far-buildings.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="textures\foreground.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="textures\Music_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="textures\Music_mute_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="textures\scarfy_run.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="textures\scarfy_death.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="textures\scarfy_idle.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

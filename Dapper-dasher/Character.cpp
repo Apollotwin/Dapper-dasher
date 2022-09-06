@@ -1,6 +1,4 @@
 ﻿#include "Character.h"
-#include <string.h>
-#include <string>
 
 Character::Character(int windowWidth, int windowHeight,AnimData run_anim_data, AnimData idle_anim_data, AnimData death_anim_data,float jumpHeight, float Gravity ):
     run_animation(run_anim_data),
