@@ -170,7 +170,7 @@ int main()
 
 #pragma region UI
     //Input Text field
-    InputTextField inputTextField{windowWidth,windowHeight, 2, 8};
+    InputTextField inputTextField{windowWidth,windowHeight, 2, 7};
     
     //Menu & Buttons
     Menu menu(windowWidth,windowHeight,"Dapper Dasher", true);
@@ -288,7 +288,7 @@ int main()
         inputTextField.Update(deltaTime);
 
         //Character Update
-        if(playerEntry) scarfy.Tick(deltaTime);
+        scarfy.Tick(deltaTime);
 
         //Clamp Music volume
         if(musicVolume > 1.f) musicVolume = 1.f;
