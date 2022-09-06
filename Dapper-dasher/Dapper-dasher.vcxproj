@@ -160,6 +160,7 @@
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="Dapper-dasher.cpp" />
     <ClCompile Include="Debugger.cpp" />
+    <ClCompile Include="HighScorePanel.cpp" />
     <ClCompile Include="InputTextField.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Nebuala.cpp" />
@@ -173,13 +174,14 @@
     <ClInclude Include="Button.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="Debugger.h" />
+    <ClInclude Include="HighScorePanel.h" />
     <ClInclude Include="InputTextField.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Nebuala.h" />
     <ClInclude Include="Serializing.h" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="HighScoresData.json" />
+    <Content Include="HighScoresData.txt" />
     <Content Include="Sound\Bzzt.wav" />
     <Content Include="Sound\Click_button.wav" />
     <Content Include="Sound\Dapper-dasher_music.wav" />

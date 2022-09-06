@@ -1,13 +1,14 @@
-#include <iostream>
+#include <fstream>
 #include <string>
-
 #include "AnimData.h"
 #include "Character.h"
+#include "HighScorePanel.h"
 #include "InputTextField.h"
 #include "Menu.h"
 #include "Nebuala.h"
-#include "raylib.h"
 #include "Serializing.h"
+#include "raylib.h"
+
 
 using namespace std;
 
@@ -20,9 +21,7 @@ bool StartGame{false};
 bool PauseGame{false};
 bool QuitGame{false};
 
-//Player score
-int PlayerHighScore{};
-int PlayerScore{};
+
 
 // acceleration due to gravity (pixels/s)/s
 const float gravity{1000.f};
@@ -73,29 +72,50 @@ void DrawParallax(const int winHeight,const Texture2D background, float bgx, con
     DrawForeground(winHeight,foreground,fgx);
 }
 
+void SaveData(HighScoreData& high_score_data, json& json_data)
+{
+    //Serialize
+    to_json(json_data, high_score_data);
+    string jsonStr = json_data.dump();
+    ofstream file_reader("HighScoresData.txt");
+    if(file_reader.is_open()) file_reader << jsonStr;
+    //SaveFileText("HighScoresData.json", const_cast<char*>(json_data.dump().c_str()));
+}
+
+
+void LoadData(HighScoreData& high_score_data, json& json_data)
+{
+    ifstream file_reader("HighScoresData.txt");
+    json_data = json::parse(file_reader);
+    
+    /*const char* loadFile = LoadFileText("HighScoresData.json");
+    json_data = json::parse(loadFile);*/
+    
+    from_json(json_data,high_score_data);
+}
+
 int main()
 {
+    HighScoreData high_score_data;
+    json json_data;
+    //SaveData(high_score_data,json_data);
+    LoadData(high_score_data, json_data);
+    
     InitWindow(windowWidth,windowHeight,"Dapper dasher!");
 
-    HighScoreData high_score_data[10];
+    //Player score
+    int PlayerScore{0};
+    float timeElapsed{0};
 
+    
     string playerName;
+    Player player;
+    player.name = { };
+    player.highscore = 0;
 
-    bool playerEntry = false;
     
-    
 
-    //Serialize High score
-    /*Player testPlayer = {"TestPlayer", 124};
-
-    for (int i = 0; i < 10; i++)
-    {
-        high_score_data->players.push_back(testPlayer);
-    }
-
-    json json_data;
-    to_json(json_data, *high_score_data);
-    SaveFileText("HighScoresData.json", const_cast<char*>(to_string(json_data).c_str()));*/
+    HighScorePanel highScorePanel{high_score_data,windowWidth,windowHeight};
 
 #pragma region Music_&_Sound
     //Music & Sound
@@ -155,13 +175,13 @@ int main()
     Nebula nebula{};
     nebula.SetAnimation(nebula_animation);
     
-    const int nebulaeAmount = 15;
+    const int nebulaeAmount = 9999;
     Nebula nebulea[nebulaeAmount]{};
 
     for (int i = 0; i < nebulaeAmount; i++)
     {
         nebulea[i] = nebula;
-        nebulea[i].InitNebula(330,i);
+        nebulea[i].InitNebula(500,i);
     }
 
     float finishLine{nebulea[nebulaeAmount - 1].GetPosition().x};
@@ -171,9 +191,10 @@ int main()
 #pragma region UI
     //Input Text field
     InputTextField inputTextField{windowWidth,windowHeight, 2, 7};
+    inputTextField.IsEnteringName = true;
     
     //Menu & Buttons
-    Menu menu(windowWidth,windowHeight,"Dapper Dasher", true);
+    Menu menu(windowWidth,windowHeight,"Dapper Dasher", false);
 
     //Start button
     Button startGameButton{"Start Game", windowWidth,windowHeight,200,100,100,DARKPURPLE,WHITE,DARKPURPLE};
@@ -231,14 +252,17 @@ int main()
 
     bool playMusic{true};
     
-    while (!WindowShouldClose() && !scarfy.QuitGame)
+    while (!WindowShouldClose() && !QuitGame)
     {
-        if(IsKeyPressed(KEY_P)) playMusic = !playMusic;
+        //Pause music?
+        //if(IsKeyPressed(KEY_P)) playMusic = !playMusic;
         
         if(playMusic) UpdateMusicStream(music);
         
         // Delta time (time since the last frame)
         float deltaTime{GetFrameTime()};
+
+        if(StartGame) timeElapsed += deltaTime * 0.001f;
         
         Vector2 mousePos = GetMousePosition();
         
@@ -282,14 +306,49 @@ int main()
         DrawText(credits.c_str(), windowWidth/2 - textLength/2, 20.f, 20,WHITE );
 
         //Draw Title
-        menu.DrawTitle(true);
+        menu.DrawTitle(!scarfy.IsDead);
         
         //Draw Input field & Check get input
         inputTextField.Update(deltaTime);
+        if(menu.isActive || restartButton.IsActive) highScorePanel.Render();
+
+        if(StartGame && scarfy.IsDead)
+        {
+            string scoreText = "Score: ";
+            scoreText.append(std::to_string(PlayerScore));
+            int scoreTextWidth = MeasureText(scoreText.c_str(), (int)restartButton.rect.width * 0.3f);
+            DrawText(scoreText.c_str(), restartButton.rect.x + restartButton.rect.width/2 - scoreTextWidth/2 - 2.f, restartButton.rect.y - restartButton.rect.height - 2.f, (int)restartButton.rect.width * 0.3f, GRAY);
+            DrawText(scoreText.c_str(), restartButton.rect.x + restartButton.rect.width/2 - scoreTextWidth/2, restartButton.rect.y - restartButton.rect.height , (int)restartButton.rect.width * 0.3f, YELLOW);
+        }
 
         //Character Update
         scarfy.Tick(deltaTime);
 
+        //Draw player score
+        if(!inputTextField.IsEnteringName && !scarfy.IsDead && !menu.isActive)
+        {
+            int textWidth = MeasureText(std::to_string(PlayerScore).c_str(), 300);
+            DrawText(std::to_string(PlayerScore).c_str(), windowWidth/2 - textWidth/2 - 3.f, windowHeight/3 - 3.f, 250, GRAY);
+            DrawText(std::to_string(PlayerScore).c_str(), windowWidth/2 - textWidth/2, windowHeight/3, 250, YELLOW);
+        }
+
+        if(PlayerScore > player.highscore)
+        {
+            player.highscore = PlayerScore;
+            highScorePanel.Update(player);
+            SaveData(high_score_data, json_data);
+        }
+
+        //Increase nebula speed over time
+        if(StartGame)
+        {
+            for (auto &nebula : nebulea)
+            {
+                nebula.SetVelocity(timeElapsed);
+            }
+        }
+
+#pragma region Buttons & sliders
         //Clamp Music volume
         if(musicVolume > 1.f) musicVolume = 1.f;
         if(musicVolume < 0.f) musicVolume = 0.f;
@@ -371,29 +430,32 @@ int main()
             DrawTexture(musicText,musicIconPosPurple.x,musicIconPosPurple.y, WHITE);
         }
 
+#pragma endregion 
+
         //Show menu if we have not pushed start game
-        if(playerEntry) menu.Show(!StartGame,startGameButton, quitGameButton);
+        if(!inputTextField.IsEnteringName) menu.Show(!StartGame,startGameButton, quitGameButton);
 
         //Check if we click start game button
-        if(playerEntry && startGameButton.MouseOverButton(mousePos) && startGameButton.Clicked(mousePos) && startGameButton.IsActive)
+        if(!inputTextField.IsEnteringName && startGameButton.MouseOverButton(mousePos) && startGameButton.Clicked(mousePos) && menu.isActive)
         {
             PlaySound(button_click_sound);
+            menu.isActive = false;
             StartGame = true;
         }
 
         //Check if we click quit button
-        if(playerEntry && quitGameButton.MouseOverButton(mousePos) && quitGameButton.Clicked(mousePos) && quitGameButton.IsActive)
+        if(!inputTextField.IsEnteringName && quitGameButton.MouseOverButton(mousePos) && quitGameButton.Clicked(mousePos) && quitGameButton.IsActive)
         {
             QuitGame = true;
+            menu.isActive = false;
             WindowShouldClose();
         }
 
         //Restart game button
-        if(playerEntry && restartButton.MouseOverButton(mousePos) && restartButton.Clicked(mousePos) && restartButton.IsActive || restartButton.IsActive && IsKeyPressed(KEY_ENTER) && scarfy.IsDead)
+        if(!inputTextField.IsEnteringName && restartButton.MouseOverButton(mousePos) && restartButton.Clicked(mousePos) && restartButton.IsActive || restartButton.IsActive && IsKeyPressed(KEY_ENTER) && scarfy.IsDead)
         {
             scarfy.IsDead = false;
             StartGame = false;
-            startGameButton.IsActive = true;
             restartButton.IsActive = false;
 
             for (auto &neb1 : nebulea)
@@ -402,20 +464,28 @@ int main()
             }
 
             finishLine = nebulea[nebulaeAmount - 1].GetPosition().x;
+            PlayerScore = 0;
         }
 
         //Collision check
-        if(playerEntry && !scarfy.IsDead && StartGame)
+        if(!inputTextField.IsEnteringName && !scarfy.IsDead && StartGame)
         {
-            for (auto &neb : nebulea)
+            //for (auto &neb : nebulea)
+            for (int i = 0; i < nebulaeAmount; i++)
             {
-                neb.Tick(deltaTime);
+                nebulea[i].Tick(deltaTime);
 
-                if(CheckCollisionRecs(neb.GetCollisionRect(),scarfy.GetCollisionRect()))
+                if(CheckCollisionRecs( nebulea[i].GetCollisionRect(),scarfy.GetCollisionRect()))
                 {
                     PlaySound(bzzt);
                     PlaySound(scarfy.deathSound);
                     scarfy.IsDead = true;
+                    
+                }
+
+                if( nebulea[i].GetPosition().x < scarfy.GetPosition().x)
+                {
+                    if(i > PlayerScore) PlayerScore++;
                 }
             }
         }
@@ -433,13 +503,13 @@ int main()
                 menu.DrawButton(quitGameButton);
             }
         }
-        else if(playerEntry && menu.isActive) //Set scarfy to idle if we are in startmenu
+        else if(menu.isActive) //Set scarfy to idle if we are in startmenu
         {
             scarfy.SetAnimation(scarfy.idle_animation);
         }
         else //Count down finishline
         {
-            if(playerEntry && StartGame) finishLine += static_cast<float>(nebula.GetVelocity()) * deltaTime;
+            if(!inputTextField.IsEnteringName && StartGame) finishLine += static_cast<float>(nebula.GetVelocity()) * deltaTime;
             
             if(finishLine < scarfy.GetPosition().x)
             {
@@ -452,22 +522,28 @@ int main()
             }
         }
 
-        if(playerEntry && IsKeyPressed(KEY_ENTER) && !scarfy.IsDead)
+        if(!inputTextField.IsActive && IsKeyPressed(KEY_ENTER) && !scarfy.IsDead)
         {
             menu.isActive = !menu.isActive;
             StartGame = !StartGame;
         }
+
+        if(inputTextField.IsActive && IsKeyPressed(KEY_ENTER) && playerName.length() <= 0)
+        {
+            player.name = inputTextField.GetInput();
+            player.highscore = 0;
+        }
+
         
         EndDrawing();
     }
+
     
     UnloadMusicStream(music);
     UnloadSound(button_click_sound);
     UnloadSound(button_hover_sound);
     scarfy.Unload();
     nebula.Unload();
-    //UnloadTexture(scarfy);
-    //UnloadTexture(nebula);
     UnloadTexture(farBG);
     UnloadTexture(middleBG);
     UnloadTexture(foreGround);

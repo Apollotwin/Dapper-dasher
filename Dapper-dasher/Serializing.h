@@ -1,19 +1,9 @@
-﻿//  To parse this JSON data, first install
-//
-//      Boost     http://www.boost.org
-//      json.hpp  https://github.com/nlohmann/json
-//
-//  Then include this file, and then do
-//
-//     Artist data = nlohmann::json::parse(jsonString);
-//     Album data = nlohmann::json::parse(jsonString);
-//     Track data = nlohmann::json::parse(jsonString);
+﻿
 
 #pragma once
 #include "vector"
 #include "nlohmann/json.hpp"
 
-struct Player;
 using nlohmann::json;
 using namespace std;
 
@@ -27,16 +17,14 @@ inline json get_untyped(const json & j, const char * property) {
 inline json get_untyped(const json & j, std::string property) {
     return get_untyped(j, property.data());
 }
-
-struct HighScoreData {
-    vector<Player> players;
-};
-
 struct Player {
     string name;
     int highscore;
 };
 
+struct HighScoreData {
+    vector<Player> players;
+};
 
 void from_json(const json & j, HighScoreData & x);
 void to_json(json & j, const HighScoreData & x);

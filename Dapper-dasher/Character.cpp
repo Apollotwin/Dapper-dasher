@@ -16,12 +16,6 @@ Character::Character(int windowWidth, int windowHeight,AnimData run_anim_data, A
 
 void Character::Tick(float deltaTime)
 {
-    if(IsKeyPressed(KEY_BACKSPACE))
-    {
-        IsDead = true;
-        PlayDeathSound();
-    }
-    
     //Ground check
     if(IsOnGround())
     {   //Rectangle is on ground

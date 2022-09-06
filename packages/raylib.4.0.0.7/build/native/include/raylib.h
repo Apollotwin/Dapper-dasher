@@ -172,6 +172,10 @@
 #define BLANK      CLITERAL(Color){ 0, 0, 0, 0 }           // Blank (Transparent)
 #define MAGENTA    CLITERAL(Color){ 255, 0, 255, 255 }     // Magenta
 #define RAYWHITE   CLITERAL(Color){ 245, 245, 245, 255 }   // My own White (raylib logo)
+#define WHITE_TRANSPARANT       CLITERAL(Color){ 255, 255, 255, 50 }
+#define WHITE_TRANSPARANT_100   CLITERAL(Color){ 255, 255, 255, 100 }
+#define DARKPURPLEISH           CLITERAL(Color){ 112, 31, 126, 250}
+#define PINK_TRANSPARANT        CLITERAL(Color){ 255, 109, 194, 100 }   
 
 //----------------------------------------------------------------------------------
 // Structures Definition

@@ -2,6 +2,8 @@
 
 #include <raylib.h>
 
+#include "Serializing.h"
+
 class InputTextField
 {
 public:
@@ -9,9 +11,12 @@ public:
     void Update(float deltaTime);
     bool MouseOverInputField(Vector2 mousePos);
     bool InputFieldClicked(Vector2 mousePos);
-    char GetInput() { return *input; }
+    string GetInput();
     bool IsHighlighted(){ return highLighted; }
     bool IsAnyKeyPressed();
+    bool IsEnteringName = true;
+    bool IsActive = true;
+    
 private:
     Rectangle textBoxRect{};
     Rectangle backgroundRect{};

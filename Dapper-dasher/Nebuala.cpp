@@ -13,6 +13,7 @@ void Nebula::InitNebula(float gapDistance ,int index)
 
     initPos.x = nebula_animation.pos.x;
 
+    nebula_animation.frame = GetRandomValue(0, nebula_animation.maxFrame);
     UpdateCollisionRect();
 }
 
@@ -78,9 +79,14 @@ Rectangle Nebula::GetCollisionRect()
     return collisionRect;
 }
 
-int Nebula::GetVelocity()
+float Nebula::GetVelocity()
 {
     return nebVel;
+}
+
+float Nebula::SetVelocity(float multiplier)
+{
+    return nebVel += multiplier * -1;
 }
 
 void Nebula::Unload()

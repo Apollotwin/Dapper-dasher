@@ -41,7 +41,7 @@ void Button::ChangeColor(Color color)
 
 bool Button::Clicked(Vector2 mousePos)
 {
-    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    if(CheckCollisionPointRec(mousePos,rect) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
         return true;
     }

@@ -12,13 +12,19 @@ InputTextField::InputTextField(int winWidth, int winHeight, int posX, int posY)
     backgroundRect = textBoxRect;
     outerLineRect = textBoxRect;
 
-    //Set the fontsize depending on menu width
+    //Set the fontsize depending on Text box width
     while (MeasureText(enterText, fontSize) < textBoxRect.width - 30.f) fontSize++;
     
 }
 
 void InputTextField::Update(float deltaTime)
 {
+    if(!IsEnteringName)
+    {
+        IsActive = false;
+        return;
+    }
+    
     DrawRectangleRec(textBoxRect,highLightColor);
     DrawRectangleLinesEx(backgroundRect,5.f,rectLineColor);
     DrawText(enterText, (float)textBoxRect.x + 4.f, textBoxRect.y - textBoxRect.height * 0.6f - 1.f,fontSize, highLightColor);
@@ -68,6 +74,12 @@ void InputTextField::Update(float deltaTime)
         // Draw blinking underscore char
         if (((frameCounter/60)%2) == 0) DrawText("_", (int)textBoxRect.x + 15.f + (float)MeasureText(input, fontSize), textBoxRect.y + textBoxRect.height/2 - 5.f, fontSize, rectLineColor);
     }
+
+    if(IsKeyPressed(KEY_ENTER) && letterCount > 0)
+    {
+        IsEnteringName = false;
+        
+    }
 }
 
 bool InputTextField::MouseOverInputField(Vector2 mousePos)
@@ -107,6 +119,11 @@ bool InputTextField::InputFieldClicked(Vector2 mousePos)
     }
     
     return false;
+}
+
+string InputTextField::GetInput()
+{
+    return input;
 }
 
 bool InputTextField::IsAnyKeyPressed()

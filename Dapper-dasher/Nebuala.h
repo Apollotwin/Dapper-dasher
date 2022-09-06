@@ -15,7 +15,8 @@ public:
     void SetPosition(float x, float y);
     Rectangle GetRect();
     Rectangle GetCollisionRect();
-    int GetVelocity();
+    float GetVelocity();
+    float SetVelocity(float multiplier);
     void Unload();
     void ResetToInitPos();
 private:
@@ -23,6 +24,6 @@ private:
     AnimData nebula_animation;
     Rectangle collisionRect{};
     void UpdateCollisionRect();
-    int nebVel{-200};
+    float nebVel{-200};
     Vector2 initPos{};
 };

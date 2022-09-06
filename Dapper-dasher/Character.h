@@ -33,7 +33,6 @@ public:
     bool IsInAir{false};
     bool IsDead{false};
     bool StartGame{false};
-    bool QuitGame{false};
     bool FreezeFrame{false};
     
     AnimData run_animation;
