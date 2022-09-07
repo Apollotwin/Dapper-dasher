@@ -77,14 +77,22 @@ void HighScorePanel::Render()
     {
         DrawRectangleLinesEx(playerInfoPanel[i], 1.5f, WHITE);
 
+        for(int j = 0; j < 10; j++)
+        {
+            if(data.players[i].name == data.players[j].name &&
+            data.players[i].highscore > data.players[j].highscore)
+            {
+                data.players[j].name = "";
+                data.players[j].highscore = 0;
+            }
+        }
+
         string index;
-        if(i == 0)
-            index = std::to_string(i + 1);
-        else
-            index = std::to_string(i + 1);
-        
+        index = std::to_string(i + 1);
         index.append(". ");
-        index.append(data.players[i].name);
+
+        if(!data.players[i].name.empty()) index.append(data.players[i].name);
+
         name = index.c_str();
 
         string hscore = std::to_string(data.players[i].highscore);

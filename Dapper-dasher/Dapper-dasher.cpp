@@ -80,7 +80,6 @@ void SaveData(HighScoreData& high_score_data, json& json_data)
     string jsonStr = json_data.dump();
     ofstream file_reader("HighScoresData.json");
     if(file_reader.is_open()) file_reader << jsonStr;
-    //SaveFileText("HighScoresData.json", const_cast<char*>(json_data.dump().c_str()));
 }
 
 
@@ -89,17 +88,28 @@ void LoadData(HighScoreData& high_score_data, json& json_data)
     ifstream file_reader("HighScoresData.json");
     json_data = json::parse(file_reader);
     
-    /*const char* loadFile = LoadFileText("HighScoresData.json");
-    json_data = json::parse(loadFile);*/
-    
     from_json(json_data,high_score_data);
+}
+
+void ResetData(HighScoreData& high_score_data, json& json_data)
+{
+    for(int i = 0; i < high_score_data.players.capacity(); i++)
+    {
+        high_score_data.players[i].name = "";
+        high_score_data.players[i].highscore = 0;
+    }
+    
+    to_json(json_data, high_score_data);
+    string jsonStr = json_data.dump();
+    ofstream file_reader("HighScoresData.json");
+    if(file_reader.is_open()) file_reader << jsonStr;
 }
 
 int main()
 {
     HighScoreData high_score_data;
     json json_data;
-    //SaveData(high_score_data,json_data);
+    
     LoadData(high_score_data, json_data);
     
     InitWindow(windowWidth,windowHeight,"Dapper dasher!");
@@ -107,14 +117,11 @@ int main()
     //Player score
     int PlayerScore{0};
     float timeElapsed{0};
-
     
     string playerName;
     Player player;
     player.name = { };
     player.highscore = 0;
-
-    
 
     HighScorePanel highScorePanel{high_score_data,windowWidth,windowHeight};
 

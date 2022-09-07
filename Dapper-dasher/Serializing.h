@@ -17,7 +17,7 @@ inline json get_untyped(const json & j, std::string property) {
 }
 struct Player {
     string name;
-    int highscore;
+    int highscore{};
 };
 
 struct HighScoreData {
