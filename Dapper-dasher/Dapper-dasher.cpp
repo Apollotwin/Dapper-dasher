@@ -111,7 +111,7 @@ int main()
     json json_data;
     
     LoadData(high_score_data, json_data);
-    
+    ResetData(high_score_data, json_data);
     InitWindow(windowWidth,windowHeight,"Dapper dasher!");
 
     //Player score
@@ -270,7 +270,7 @@ int main()
         // Delta time (time since the last frame)
         float deltaTime{GetFrameTime()};
 
-        if(StartGame) timeElapsed += deltaTime * 0.001f;
+        if(StartGame) timeElapsed += deltaTime * 0.002f;
         
         Vector2 mousePos = GetMousePosition();
         
